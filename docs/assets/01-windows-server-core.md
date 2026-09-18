@@ -59,3 +59,28 @@ if ($env:COMPUTERNAME -ne$NewHostName) {
     Start-Sleep -Seconds 5
     Restart-Computer
 }
+
+## 7. Promoción a Controlador de Dominio (AD DS)
+
+### Objetivo
+Desplegar el rol de Active Directory Domain Services (AD DS) y promover `DC01-SRV` como el Controlador de Dominio principal del nuevo bosque `hl.internal`.
+
+### Script de Automatización (`scripts/01-windows-server/02-deploy-ad-ds.ps1`)
+El script instala la característica `AD-Domain-Services` junto con sus herramientas de gestión y ejecuta `Install-ADDSForest` mediante *splatting* para evitar errores de sintaxis en CLI.
+
+```powershell
+$DomainName   = "hl.internal"
+$NetBiosName  = "HL"
+$DSRMPassword = ConvertTo-SecureString "P@ssw0rd2026!" -AsPlainText -Force
+
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+
+$ForestParams = @{
+    DomainName                    = $DomainName
+    DomainNetbiosName             = $NetBiosName
+    InstallDns                    = $true
+    SafeModeAdministratorPassword = $DSRMPassword
+    Force                         = $true
+}
+
+Install-ADDSForest @ForestParams
