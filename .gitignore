@@ -1,0 +1,9 @@
+# En macOS/Linux o Git Bash
+cat <<EOT > .gitignore
+.DS_Store
+Thumbs.db
+.vscode/
+*.env
+*.pfx
+*.pem
+EOT
